@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
+import axiosInstance from '../../axiosInstance'; // Adjust the path as needed
 
 const RegisterScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -8,26 +9,36 @@ const RegisterScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [stream, setStream] = useState('');
+  const [school, setSchool] = useState('');
+  const [state, setState] = useState('');
   const [streamVisible, setStreamVisible] = useState(false);
 
   const streams = ['Natural', 'Social'];
 
   const handleStreamSelect = (selectedStream) => {
     setStream(selectedStream);
-    setStreamVisible(false); // Hide the options after selection
+    setStreamVisible(false);
   };
 
-  const handleRegister = () => {
-    console.log('Registering with:', { firstName, lastName, phoneNumber, password, stream });
-    setStreamVisible(false)
-    // Clear the input fields
-    setFirstName('');
-    setLastName('');
-    setPhoneNumber('');
-    setPassword('');
-    setStream('');
+  const handleRegister = async () => {
+    try {
+      const response = await axiosInstance.post('/register', {
+        firstName,
+        lastName,
+        phoneNumber,
+        password,
+        stream, // Backend maps stream to role
+        school,
+        state,
+      });
+
+      alert('Registration successful!');
+      navigation.navigate('LoginScreen');
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      alert(error.response?.data?.message || 'Error registering user');
+    }
   };
-  
 
   return (
     <View style={tw`flex-1 bg-white justify-center px-6`}>
@@ -92,6 +103,22 @@ const RegisterScreen = ({ navigation }) => {
           />
         </View>
       )}
+
+      {/* School Input */}
+      <TextInput
+        style={tw`border border-gray-300 rounded-md p-4 mb-4`}
+        placeholder="School"
+        value={school}
+        onChangeText={setSchool}
+      />
+
+      {/* State Input */}
+      <TextInput
+        style={tw`border border-gray-300 rounded-md p-4 mb-4`}
+        placeholder="State"
+        value={state}
+        onChangeText={setState}
+      />
 
       {/* Register Button */}
       <TouchableOpacity

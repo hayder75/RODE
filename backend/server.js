@@ -15,6 +15,6 @@ app.use(express.json());  // For parsing JSON requests
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(5000, '0.0.0.0', () => {
+  console.log('Server is running on port 5000');
 });
