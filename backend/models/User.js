@@ -16,7 +16,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  role: {  // Social or Natural
+  hasPaid: {
+    type: Boolean,
+    default: false, // Default to false if payment not made
+  },
+  role: {
     type: String,
     enum: ['Social', 'Natural'],
     required: true,
