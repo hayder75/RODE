@@ -1,1 +1,2 @@
-todays push : 
+chmod +x auto_push.sh
+./auto_push.sh

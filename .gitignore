@@ -22,3 +22,5 @@ Thumbs.db
 
 # Operating System files
 *.swp
+
+.text
