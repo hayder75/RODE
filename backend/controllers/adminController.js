@@ -134,13 +134,51 @@ const uploadBulkQuestions = async (req, res) => {
 const verifyUser = async (req, res) => {
     const { id } = req.params;
     try {
-        const user = await User.findByIdAndUpdate(id, { isVerified: true }, { new: true });
+        // Find the user by ID
+        const user = await User.findById(id);
+        
         if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Check if the user has already paid
+        if (user.hasPaid) {
+            return res.status(400).json({ message: 'User has already paid, no need to verify.' });
+        }
+
+        // Update the user's payment status and verification state
+        user.hasPaid = true; // Mark as paid
+        user.state = "Verified"; // Update state to "Verified"
+
+        await user.save(); // Save updated user
+
         res.json({ message: 'User verified successfully', user });
     } catch (error) {
         res.status(500).json({ message: 'Error verifying user', error });
     }
 };
+
+
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({}, 'name phoneNumber role state'); // Select fields to return
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users', error });
+    }
+};
+
+const getSingleUserById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await User.findById(id, 'name phoneNumber role state'); // Pass ID directly
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' }); // Handle user not found
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user', error });
+    }
+};
+
 
 module.exports = {
     loginAdmin,
@@ -151,5 +189,7 @@ module.exports = {
     getReferences,
     deleteReference,
     verifyUser,
-    uploadBulkQuestions
+    uploadBulkQuestions,
+    getAllUsers,
+    getSingleUserById
 };

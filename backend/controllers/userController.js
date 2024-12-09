@@ -5,9 +5,19 @@ const jwt = require('jsonwebtoken');
 
 // User Registration
 const registerUser = async (req, res) => {
-    const { name, phoneNumber, password, role, school, state } = req.body;
+    const { name, phoneNumber, password, role, school } = req.body; // Removed state from destructuring
     try {
-        const newUser = new User({ name, phoneNumber, password, role, school, state });
+        // Create a new user with default values for hasPaid and state
+        const newUser = new User({
+            name,
+            phoneNumber,
+            password,
+            role,
+            school,
+            hasPaid: false, // Default to false if payment not made
+            state: "Not Verified" // Default state is 'Not Verified'
+        });
+
         await newUser.save();
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {

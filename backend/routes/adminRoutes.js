@@ -8,6 +8,8 @@ const {
     getReferences,
     deleteReference,
     verifyUser,
+    getAllUsers,
+    getSingleUserById
 } = require('../controllers/adminController');
 const { protectAdmin } = require('../middleware/authMiddleware');
 const router = express.Router();
@@ -27,5 +29,10 @@ router.delete('/references/:id', protectAdmin, deleteReference);
 
 // User Verification
 router.put('/users/:id/verify', protectAdmin, verifyUser);
+
+// Get All Users
+router.get('/users', protectAdmin, getAllUsers); // Ensure this route is defined with GET method
+
+router.get('/users/:id', protectAdmin, getSingleUserById); // Ensure this route is defined with GET method
 
 module.exports = router;
