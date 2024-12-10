@@ -180,14 +180,21 @@ const getSingleUserById = async (req, res) => {
 };
 
 // Get Users Awaiting Verification
+// Get Users Awaiting Verification
 const getPendingVerifications = async (req, res) => {
     try {
-      const users = await User.find({ state: "Not Verified", hasPaid: true }); // Fetch users with specific criteria
+      // Fetch users with specific criteria: Not Verified and hasPaid is false
+      const users = await User.find({ 
+        state: "Not Verified", 
+        hasPaid: false, 
+        paymentScreenshotUrl: { $ne: null } // Ensure there is a payment screenshot uploaded
+      }); 
       res.json(users);
     } catch (error) {
       res.status(500).json({ message: 'Error fetching pending verifications', error });
     }
   };
+  
   
   // Ensure you export this function in your admin controller module.exports section.
   

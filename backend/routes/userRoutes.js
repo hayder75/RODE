@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 const {
     registerUser,
     loginUser,
@@ -9,6 +10,8 @@ const {
     uploadPaymentScreenshot,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/userMiddleware');
+
+const upload = multer({ dest: 'uploads/' }); 
 
 const router = express.Router();
 
@@ -29,6 +32,5 @@ router.get('/subjects' , getSubjects);
 // Get Test Years by Subject
 router.get('/test-years', getTestYearsBySubject);
 
-router.post('/upload-payment-screenshot', protect, uploadPaymentScreenshot); 
-
+router.post('/upload-payment-screenshot', protect, upload.single('image'), uploadPaymentScreenshot); 
 module.exports = router;

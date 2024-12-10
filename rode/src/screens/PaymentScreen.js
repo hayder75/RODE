@@ -19,16 +19,21 @@ const PaymentScreen = ({ navigation }) => {
   }, []);
 
   const pickImage = async () => {
-    // Launch image picker
+    console.log('Picking image...'); // Debug log
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: [ImagePicker.MediaType.Images], // Use MediaType directly
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
+    console.log('Result:', result); // Log the result of the image picker
+
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri); // Use result.assets[0].uri for Expo ImagePicker
+      console.log('Selected Image URI:', result.assets[0].uri); // Log selected image URI
+    } else {
+      console.log('Image selection canceled'); // Log cancellation
     }
   };
 

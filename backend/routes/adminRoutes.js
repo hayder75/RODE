@@ -9,7 +9,8 @@ const {
     deleteReference,
     verifyUser,
     getAllUsers,
-    getSingleUserById
+    getSingleUserById,
+    getPendingVerifications 
 } = require('../controllers/adminController');
 const { protectAdmin } = require('../middleware/authMiddleware');
 const router = express.Router();
@@ -34,5 +35,8 @@ router.put('/users/:id/verify', protectAdmin, verifyUser);
 router.get('/users', protectAdmin, getAllUsers); // Ensure this route is defined with GET method
 
 router.get('/users/:id', protectAdmin, getSingleUserById); // Ensure this route is defined with GET method
+
+
+router.get('/pending-verifications', protectAdmin, getPendingVerifications); // New route for pending verifications
 
 module.exports = router;
