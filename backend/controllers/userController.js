@@ -2,6 +2,17 @@ const User = require('../models/User');
 const Question = require('../models/Question');
 const TestAttempt = require('../models/TestAttempt');
 const jwt = require('jsonwebtoken');
+const cloudinary = require ('cloudinary').v2;
+
+
+// Configuration
+cloudinary.config({ 
+    cloud_name: 'ddgukdjyd', 
+    api_key: '769494294237147', 
+    api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
+});
+
+
 
 // User Registration
 const registerUser = async (req, res) => {
@@ -120,6 +131,31 @@ const submitTestAttempt = async (req, res) => {
     }
 };
 
+
+// Upload Payment Screenshot
+const uploadPaymentScreenshot = async (req, res) => {
+    const userId = req.user.id; // Get user ID from token (assuming you have middleware to protect this route)
+    
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+  
+      // Upload image to Cloudinary (or any other storage)
+      const result = await cloudinary.uploader.upload(req.file.path);
+  
+      // Update user with the uploaded image URL and set hasPaid to false initially
+      await User.findByIdAndUpdate(userId, {
+        paymentScreenshotUrl: result.secure_url,
+        hasPaid: false,
+      });
+  
+      res.status(200).json({ message: 'Payment screenshot uploaded successfully', url: result.secure_url });
+    } catch (error) {
+      console.error('Error uploading payment screenshot:', error);
+      res.status(500).json({ message: 'Error uploading payment screenshot', error });
+    }
+  };
 module.exports = {
     registerUser,
     loginUser,
@@ -127,4 +163,5 @@ module.exports = {
     submitTestAttempt,
     getSubjects,
     getTestYearsBySubject,
+    uploadPaymentScreenshot,
 };

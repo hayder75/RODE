@@ -6,7 +6,9 @@ const {
     submitTestAttempt,
     getSubjects,
     getTestYearsBySubject,
+    uploadPaymentScreenshot,
 } = require('../controllers/userController');
+const { protect } = require('../middleware/userMiddleware');
 
 const router = express.Router();
 
@@ -26,5 +28,7 @@ router.get('/subjects' , getSubjects);
 
 // Get Test Years by Subject
 router.get('/test-years', getTestYearsBySubject);
+
+router.post('/upload-payment-screenshot', protect, uploadPaymentScreenshot); 
 
 module.exports = router;

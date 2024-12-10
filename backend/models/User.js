@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
     type: String,
    default: "Not Verified",
   },
+  paymentScreenshotUrl: { // New field for storing payment screenshot URL
+    type: String,
+    default: null
+  },
 });
 
 // Password hashing before saving to the DB

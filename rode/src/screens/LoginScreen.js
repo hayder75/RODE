@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import axiosInstance from '../../axiosInstance';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -14,11 +15,14 @@ const LoginScreen = ({ navigation }) => {
         password,
       });
   
-      // Navigate to HomeScreen with user's name, stream, and payment status
+      // Store token in AsyncStorage
+      await AsyncStorage.setItem('token', response.data.token);
+  
+      // Navigate to HomeScreen with user's name, hasPaid, and stream
       navigation.navigate('Homescreen', { 
         name: response.data.name, 
-        hasPaid: response.data.hasPaid, // Include hasPaid
-        stream: response.data.stream // Include stream
+        hasPaid: response.data.hasPaid, 
+        stream: response.data.stream 
       });
     } catch (error) {
       console.error(error.response?.data || error.message);
@@ -26,6 +30,7 @@ const LoginScreen = ({ navigation }) => {
     }
   };
   
+   
 
   return (
     <View style={tw`flex-1 bg-white justify-center px-6`}>
