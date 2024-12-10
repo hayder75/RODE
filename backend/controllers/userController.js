@@ -5,14 +5,14 @@ const jwt = require('jsonwebtoken');
 
 // User Registration
 const registerUser = async (req, res) => {
-    const { name, phoneNumber, password, role, school } = req.body; // Removed state from destructuring
+    const { name, phoneNumber, password, stream, school } = req.body; // Removed state from destructuring
     try {
         // Create a new user with default values for hasPaid and state
         const newUser = new User({
             name,
             phoneNumber,
             password,
-            role,
+            stream,
             school,
             hasPaid: false, // Default to false if payment not made
             state: "Not Verified" // Default state is 'Not Verified'
@@ -54,18 +54,18 @@ const getQuestions = async (req, res) => {
     }
 };
 
-// Get List of Subjects Based on User Role
+// Get List of Subjects Based on User stream
 const getSubjects = async (req, res) => {
-    const { role } = req.query; // Expecting role as a query parameter
+    const { stream } = req.query; // Expecting stream as a query parameter
 
     let subjects;
 
-    if (role === 'Natural') {
+    if (stream === 'Natural') {
         subjects = ['Math', 'English', 'Biology', 'Chemistry']; // Natural subjects
-    } else if (role === 'Social') {
+    } else if (stream === 'Social') {
         subjects = ['Math', 'History', 'Geography']; // Social subjects
     } else {
-        return res.status(400).json({ message: 'Invalid role' });
+        return res.status(400).json({ message: 'Invalid stream' });
     }
 
     res.json({ subjects });

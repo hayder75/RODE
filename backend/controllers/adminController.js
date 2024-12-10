@@ -159,7 +159,7 @@ const verifyUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find({}, 'name phoneNumber role state'); // Select fields to return
+        const users = await User.find({}, 'name phoneNumber role state stream'); // Select fields to return
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching users', error });

@@ -1,14 +1,34 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
+import axiosInstance from '../../axiosInstance'; // Adjust path as necessary
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { name, hasPaid } = route.params || {}; // Get name and payment status from route params
+  const { name, hasPaid, stream } = route.params || {}; // Get name, payment status, and stream from route params
+  const [subjects, setSubjects] = useState([]);
 
-  const handleLogout = () => {
-    // Add logout logic (e.g., clear token, navigate to login screen)
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const response = await axiosInstance.get('/subjects', { params: { stream } });
+        setSubjects(response.data.subjects);
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Error fetching subjects');
+      }
+    };
+
+    if (stream) {
+      fetchSubjects();
+    }
+  }, [stream]);
+
+  const handleLogout = async () => {
+    // Clear token and navigate to login screen
+    await AsyncStorage.removeItem('token');
     navigation.reset({
       index: 0,
       routes: [{ name: 'LoginScreen' }],
@@ -27,32 +47,32 @@ const HomeScreen = ({ route }) => {
 
       {/* Middle Section */}
       <View style={tw`flex-1 justify-center px-6`}>
-        {/* Social Button */}
-        <TouchableOpacity
-          style={tw`bg-blue-500 py-3 rounded-md mb-4`}
-          onPress={() => navigation.navigate('SubjectListScreen', { stream: 'Social' })}
-        >
-          <Text style={tw`text-white text-center text-lg`}>Social</Text>
-        </TouchableOpacity>
-
-        {/* Natural Button */}
-        <TouchableOpacity
-          style={tw`bg-green-500 py-3 rounded-md mb-4`}
-          onPress={() => navigation.navigate('SubjectListScreen', { stream: 'Natural' })}
-        >
-          <Text style={tw`text-white text-center text-lg`}>Natural</Text>
-        </TouchableOpacity>
+        {/* Check Payment Status */}
+        {!hasPaid ? (
+          <Text style={tw`text-red-500 text-lg text-center mb-4`}>
+            Your tests are locked until payment is made.
+          </Text>
+        ) : (
+          subjects.map((subject) => (
+            <TouchableOpacity
+              key={subject}
+              style={tw`bg-blue-500 py-3 rounded-md mb-4`}
+              onPress={() => navigation.navigate('SubjectListScreen', { stream, subject })}
+            >
+              <Text style={tw`text-white text-center text-lg`}>{subject}</Text>
+            </TouchableOpacity>
+          ))
+        )}
 
         {/* Payment Button (Conditionally Rendered) */}
         {!hasPaid && (
-  <TouchableOpacity
-    style={tw`bg-red-500 py-3 rounded-md`}
-    onPress={() => navigation.navigate('PaymentScreen')}
-  >
-    <Text style={tw`text-white text-center text-lg`}>150 Birr Pay</Text>
-  </TouchableOpacity>
-)}
-
+          <TouchableOpacity
+            style={tw`bg-red-500 py-3 rounded-md`}
+            onPress={() => navigation.navigate('PaymentScreen')}
+          >
+            <Text style={tw`text-white text-center text-lg`}>150 Birr Pay</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Bottom Navigation Bar */}

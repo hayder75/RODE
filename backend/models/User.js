@@ -20,13 +20,14 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // Default to false if payment not made
   },
-  role: {
+  stream: {
     type: String,
     enum: ['Social', 'Natural'],
     required: true,
   },
   school: {
     type: String,
+    default:'School'
   },
   state: {
     type: String,
