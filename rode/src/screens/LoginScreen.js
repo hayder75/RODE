@@ -13,14 +13,19 @@ const LoginScreen = ({ navigation }) => {
         phoneNumber,
         password,
       });
-
-      // Navigate to HomeScreen with user's name
-      navigation.navigate('Homescreen', { name: response.data.name });
+  
+      // Navigate to HomeScreen with user's name, stream, and payment status
+      navigation.navigate('Homescreen', { 
+        name: response.data.name, 
+        hasPaid: response.data.hasPaid, // Include hasPaid
+        stream: response.data.stream // Include stream
+      });
     } catch (error) {
       console.error(error.response?.data || error.message);
       alert(error.response?.data?.message || 'Error logging in');
     }
   };
+  
 
   return (
     <View style={tw`flex-1 bg-white justify-center px-6`}>

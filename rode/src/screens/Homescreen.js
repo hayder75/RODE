@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
 import axiosInstance from '../../axiosInstance'; // Adjust path as necessary
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialIcons } from '@expo/vector-icons'; // For lock icon
 
 const HomeScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -14,6 +15,7 @@ const HomeScreen = ({ route }) => {
     const fetchSubjects = async () => {
       try {
         const response = await axiosInstance.get('/subjects', { params: { stream } });
+        console.log('API Response:', response.data);
         setSubjects(response.data.subjects);
       } catch (error) {
         console.error(error);
@@ -27,7 +29,6 @@ const HomeScreen = ({ route }) => {
   }, [stream]);
 
   const handleLogout = async () => {
-    // Clear token and navigate to login screen
     await AsyncStorage.removeItem('token');
     navigation.reset({
       index: 0,
@@ -47,42 +48,35 @@ const HomeScreen = ({ route }) => {
 
       {/* Middle Section */}
       <View style={tw`flex-1 justify-center px-6`}>
-        {/* Check Payment Status */}
-        {!hasPaid ? (
-          <Text style={tw`text-red-500 text-lg text-center mb-4`}>
-            Your tests are locked until payment is made.
-          </Text>
-        ) : (
+        {/* Display Subjects */}
+        {subjects.length > 0 ? (
           subjects.map((subject) => (
-            <TouchableOpacity
-              key={subject}
-              style={tw`bg-blue-500 py-3 rounded-md mb-4`}
-              onPress={() => navigation.navigate('SubjectListScreen', { stream, subject })}
-            >
-              <Text style={tw`text-white text-center text-lg`}>{subject}</Text>
-            </TouchableOpacity>
+            <View key={subject} style={tw`flex-row justify-between items-center mb-4`}>
+              <TouchableOpacity
+                style={tw`bg-blue-500 py-3 rounded-md flex-1 mr-2`}
+                onPress={() => navigation.navigate('YearSelectionScreen', { subject, stream })} // Pass subject and stream
+                // disabled={!hasPaid}
+              >
+                <Text style={tw`text-white text-center text-lg`}>{subject}</Text>
+              </TouchableOpacity>
+              {!hasPaid && (
+                <MaterialIcons name="lock" size={24} color="white" style={tw`ml-2`} />
+              )}
+            </View>
           ))
+        ) : (
+          <Text style={tw`text-center text-lg`}>No subjects available</Text>
         )}
 
-        {/* Payment Button (Conditionally Rendered) */}
+        {/* Payment Button */}
         {!hasPaid && (
           <TouchableOpacity
-            style={tw`bg-red-500 py-3 rounded-md`}
+            style={tw`bg-red-500 py-3 rounded-md mt-4`}
             onPress={() => navigation.navigate('PaymentScreen')}
           >
             <Text style={tw`text-white text-center text-lg`}>150 Birr Pay</Text>
           </TouchableOpacity>
         )}
-      </View>
-
-      {/* Bottom Navigation Bar */}
-      <View style={tw`border-t border-gray-300 py-2 px-6`}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Homescreen')}
-          style={tw`flex-row justify-center`}
-        >
-          <Text style={tw`text-blue-500 text-center text-lg`}>Home</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
