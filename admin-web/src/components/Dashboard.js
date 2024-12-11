@@ -1,36 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { fetchDashboard, verifyScreenshot } from '../api';
+import { getPendingVerifications } from '../api/index';
 import ScreenshotCard from './ScreenshotCard';
+import './Dashboard.css'; // Importing CSS for styling
 
 const Dashboard = () => {
-    const [userCount, setUserCount] = useState(0);
-    const [screenshots, setScreenshots] = useState([]);
+  const [screenshots, setScreenshots] = useState([]);
 
-    useEffect(() => {
-        const loadDashboard = async () => {
-            const { data } = await fetchDashboard();
-            setUserCount(data.userCount);
-            setScreenshots(data.screenshots);
-        };
-        loadDashboard();
-    }, []);
-
-    const handleVerify = async (id) => {
-        await verifyScreenshot(id);
-        setScreenshots(screenshots.filter((s) => s._id !== id));
+  useEffect(() => {
+    const loadPendingUsers = async () => {
+      try {
+        const { data } = await getPendingVerifications();
+        setScreenshots(data);
+      } catch (error) {
+        console.error(
+          'Error fetching pending verifications:',
+          error.response ? error.response.data : error.message
+        );
+        alert('Failed to fetch pending verifications.');
+      }
     };
 
-    return (
-        <div className="dashboard">
-            <h1>Admin Dashboard</h1>
-            <p>Total Users: {userCount}</p>
-            <div className="screenshots">
-                {screenshots.map((s) => (
-                    <ScreenshotCard key={s._id} screenshot={s} onVerify={handleVerify} />
-                ))}
-            </div>
+    loadPendingUsers();
+  }, []);
+
+  return (
+    <div className="dashboard">
+      <header className="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <h2>Pending User Verifications</h2>
+      </header>
+      {screenshots.length === 0 ? (
+        <p className="no-verifications">No users to be verified.</p>
+      ) : (
+        <div className="screenshots-container">
+          {screenshots.map((screenshot) => (
+            <ScreenshotCard key={screenshot._id} screenshot={screenshot} />
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default Dashboard;

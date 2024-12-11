@@ -7,20 +7,30 @@ const jwt = require('jsonwebtoken');
 
 // Admin Login
 const loginAdmin = async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
+    console.log('Login attempt:', req.body); // Log request body
     try {
-        const admin = await Admin.findOne({ email });
-        if (!admin) return res.status(401).json({ message: 'Invalid email or password' });
+        const admin = await Admin.findOne({ username });
+        if (!admin) {
+            console.log('Admin not found');
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
 
         const isMatch = await bcrypt.compare(password, admin.password);
-        if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
+        if (!isMatch) {
+            console.log('Password does not match');
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
 
         const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        console.log('Login successful, token:', token);
         res.json({ token });
     } catch (error) {
+        console.error('Server error:', error);
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
 
 // Upload Question
 const uploadQuestion = async (req, res) => {
@@ -183,17 +193,18 @@ const getSingleUserById = async (req, res) => {
 // Get Users Awaiting Verification
 const getPendingVerifications = async (req, res) => {
     try {
-      // Fetch users with specific criteria: Not Verified and hasPaid is false
-      const users = await User.find({ 
-        state: "Not Verified", 
-        hasPaid: false, 
-        paymentScreenshotUrl: { $ne: null } // Ensure there is a payment screenshot uploaded
-      }); 
-      res.json(users);
+        const users = await User.find({
+            state: "Not Verified",
+            hasPaid: false,
+            paymentScreenshotUrl: { $ne: null } // Ensure there is a payment screenshot uploaded
+        });
+        res.json(users);
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching pending verifications', error });
+        console.error('Error fetching pending verifications:', error);
+        res.status(500).json({ message: 'Error fetching pending verifications', error });
     }
-  };
+};
+
   
   
   // Ensure you export this function in your admin controller module.exports section.

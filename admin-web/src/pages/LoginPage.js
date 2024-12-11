@@ -1,22 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoginForm from '../components/LoginForm';
-import { login } from '../api';
+import AdminLogin from '../components/AdminLogin';
+import { login } from '../api/index';
 
 const LoginPage = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleLogin = async (credentials) => {
-        try {
-            const { data } = await login(credentials);
-            localStorage.setItem('token', data.token);
-            navigate('/admin');
-        } catch {
-            alert('Invalid credentials!');
-        }
-    };
+  const handleLogin = async (credentials) => {
+    try {
+      const { data } = await login(credentials); // Call login API
+      localStorage.setItem('token', data.token); // Store token
+      navigate('/admin/dashboard'); // Redirect to the dashboard
+    } catch (error) {
+      alert('Invalid credentials!'); // Error feedback
+    }
+  };
 
-    return <LoginForm onLogin={handleLogin} />;
+  return <AdminLogin onLogin={handleLogin} />; // Pass onLogin as a prop
 };
 
 export default LoginPage;

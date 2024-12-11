@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors')
 const connectDB = require('./config/db'); // Use your db.js
 const createAdmin = require('./createAdmin'); // Adjust path if necessary
 const adminRoutes = require('./routes/adminRoutes');
@@ -7,6 +8,7 @@ require('dotenv').config(); // Load .env variables
 
 const app = express();
 
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // For parsing application/json
 
 // Connect to MongoDB and create an initial admin if needed
@@ -17,7 +19,7 @@ connectDB()
     .catch(err => console.error('Error during initialization:', err));
 
 // Use routes
-app.use('/api/admin', adminRoutes);
+app.use('/api/v1/admin', adminRoutes); 
 app.use('/api/users', userRoutes);
 
 const PORT = process.env.PORT || 5000;

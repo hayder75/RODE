@@ -1,0 +1,22 @@
+/* Dashboard.css */
+.dashboard {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .screenshots-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .no-verifications {
+    text-align: center;
+    color: #555;
+  }
+  
