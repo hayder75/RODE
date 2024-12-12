@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import axiosInstance from '../../axiosInstance'; // Adjust the path as needed
+import Logo from '../../src/Untitled design.png'; // Adjust path as needed
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
-  // const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [stream, setStream] = useState('');
   const [school, setSchool] = useState('');
-  // const [state, setState] = useState('');
   const [streamVisible, setStreamVisible] = useState(false);
 
   const streams = ['Natural', 'Social'];
@@ -28,7 +27,6 @@ const RegisterScreen = ({ navigation }) => {
         password,
         stream, // Backend maps stream to role
         school,
-        
       });
 
       alert('Registration successful!');
@@ -41,6 +39,11 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <View style={tw`flex-1 bg-white justify-center px-6`}>
+      {/* Logo at the top */}
+      <View style={styles.logoContainer}>
+        <Image source={Logo} style={styles.logo} />
+      </View>
+
       <Text style={tw`text-3xl font-bold mb-8 text-center`}>Register</Text>
 
       {/* First Name Input */}
@@ -50,14 +53,6 @@ const RegisterScreen = ({ navigation }) => {
         value={name}
         onChangeText={setName}
       />
-
-      {/* Last Name Input
-      <TextInput
-        style={tw`border border-gray-300 rounded-md p-4 mb-4`}
-        placeholder="Last Name"
-        value={lastName}
-        onChangeText={setLastName}
-      /> */}
 
       {/* Phone Number Input */}
       <TextInput
@@ -111,14 +106,6 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={setSchool}
       />
 
-      {/* State Input */}
-      {/* <TextInput
-        style={tw`border border-gray-300 rounded-md p-4 mb-4`}
-        placeholder="State"
-        value={state}
-        onChangeText={setState}
-      /> */}
-
       {/* Register Button */}
       <TouchableOpacity
         style={tw`bg-blue-500 py-3 rounded-md mb-4`}
@@ -134,5 +121,16 @@ const RegisterScreen = ({ navigation }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  logo: {
+    width: 300, // Adjust this to make the logo smaller
+    height: 300, // Adjust this to make the logo smaller
+  },
+});
 
 export default RegisterScreen;

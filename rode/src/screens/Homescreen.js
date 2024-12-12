@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
 import axiosInstance from '../../axiosInstance'; // Adjust path as necessary
@@ -36,47 +36,63 @@ const HomeScreen = ({ route }) => {
     });
   };
 
+  const renderSubject = ({ item }) => (
+    <View style={tw`flex-1 px-2 mb-4`}>
+      <TouchableOpacity
+        style={tw`bg-blue-500 p-4 rounded-lg flex justify-center items-center`}
+        onPress={() => navigation.navigate('YearSelectionScreen', { subject: item, stream })}
+      >
+        <Text style={tw`text-white text-center text-lg`}>{item}</Text>
+      </TouchableOpacity>
+      {!hasPaid && (
+        <MaterialIcons name="lock" size={24} color="white" style={tw`absolute top-2 right-2`} />
+      )}
+    </View>
+  );
+
   return (
     <View style={tw`flex-1 bg-white`}>
       {/* Top Section */}
-      <View style={tw`flex-row justify-between items-center px-6 py-4`}>
-        <Text style={tw`text-2xl font-bold`}>Hello, {name}!</Text>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={tw`text-blue-500`}>Logout</Text>
+      <View style={tw`px-6 py-4`}>
+        <Text style={tw`text-xl font-bold text-center mb-4`}>Hello, {name}!</Text>
+        <TouchableOpacity
+          style={tw`bg-gray-300 py-2 px-4 rounded-md`}
+          onPress={handleLogout}
+        >
+          <Text style={tw`text-blue-500 text-center text-sm`}>Logout</Text>
         </TouchableOpacity>
       </View>
 
       {/* Middle Section */}
-      <View style={tw`flex-1 justify-center px-6`}>
-        {/* Display Subjects */}
-        {subjects.length > 0 ? (
-          subjects.map((subject) => (
-            <View key={subject} style={tw`flex-row justify-between items-center mb-4`}>
-              <TouchableOpacity
-                style={tw`bg-blue-500 py-3 rounded-md flex-1 mr-2`}
-                onPress={() => navigation.navigate('YearSelectionScreen', { subject, stream })} // Pass subject and stream
-                // disabled={!hasPaid}
-              >
-                <Text style={tw`text-white text-center text-lg`}>{subject}</Text>
-              </TouchableOpacity>
-              {!hasPaid && (
-                <MaterialIcons name="lock" size={24} color="white" style={tw`ml-2`} />
-              )}
-            </View>
-          ))
-        ) : (
-          <Text style={tw`text-center text-lg`}>No subjects available</Text>
-        )}
+      <View style={tw`flex-1 px-6`}>
+        {/* Subjects Display (3 in a row) */}
+        <FlatList
+          data={subjects}
+          renderItem={renderSubject}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={3}
+          columnWrapperStyle={tw`justify-between`}
+        />
 
         {/* Payment Button */}
         {!hasPaid && (
           <TouchableOpacity
-            style={tw`bg-red-500 py-3 rounded-md mt-4`}
+            style={tw`bg-red-500 py-3 rounded-md mt-6 mb-4`}
             onPress={() => navigation.navigate('PaymentScreen')}
           >
-            <Text style={tw`text-white text-center text-lg`}>150 Birr Pay</Text>
+            <Text style={tw`text-white text-center text-lg`}>Pay 150 Birr</Text>
           </TouchableOpacity>
         )}
+      </View>
+
+      {/* Footer/Navigation area */}
+      <View style={tw`px-6 py-2`}>
+        <TouchableOpacity
+          style={tw`bg-gray-300 py-2 px-4 rounded-md`}
+          onPress={() => navigation.navigate('AnotherScreen')} // Example of another navigation if needed
+        >
+          <Text style={tw`text-center text-blue-500 text-sm`}>Go to Another Screen</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
