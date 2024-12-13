@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: 'http://192.168.106.141:5000/api/users', // Updated to match the backend IP
+  baseURL: 'http://192.168.112.14:5000/api/users', // Updated to match the backend IP
   headers: {
     'Content-Type': 'application/json',
   },

@@ -8,7 +8,7 @@ import { MaterialIcons } from '@expo/vector-icons'; // For lock icon
 
 const HomeScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { name, hasPaid, stream } = route.params || {}; // Get name, payment status, and stream from route params
+  const { name, hasPaid, stream ,id } = route.params || {}; // Get name, payment status, and stream from route params
   const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const HomeScreen = ({ route }) => {
     <View style={tw`flex-1 px-2 mb-4`}>
       <TouchableOpacity
         style={tw`bg-blue-500 p-4 rounded-lg flex justify-center items-center`}
-        onPress={() => navigation.navigate('YearSelectionScreen', { subject: item, stream })}
+        onPress={() => navigation.navigate('YearSelectionScreen', { subject: item, stream , id})}
       >
         <Text style={tw`text-white text-center text-lg`}>{item}</Text>
       </TouchableOpacity>

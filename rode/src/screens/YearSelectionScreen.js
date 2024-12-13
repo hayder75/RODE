@@ -4,7 +4,7 @@ import axiosInstance from '../../axiosInstance'; // Adjust path as necessary
 import tw from 'tailwind-react-native-classnames';
 
 const YearSelectionScreen = ({ route, navigation }) => {
-  const { subject } = route.params; // Get subject from route params
+  const { subject , id } = route.params; // Get subject from route params
   const [years, setYears] = useState([]);
   const [errorMessage, setErrorMessage] = useState(''); // State to hold error message
 
@@ -45,7 +45,7 @@ const YearSelectionScreen = ({ route, navigation }) => {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={tw`border border-gray-300 py-3 rounded-md mx-4 mb-4`}
-              onPress={() => navigation.navigate('TestScreen', { subject, year: item })} // Navigate to TestScreen with subject and year
+              onPress={() => navigation.navigate('TestScreen', { subject, year: item , id})} // Navigate to TestScreen with subject and year
             >
               <Text style={tw`text-center text-lg`}>{item}</Text>
             </TouchableOpacity>

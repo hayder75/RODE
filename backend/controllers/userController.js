@@ -47,7 +47,7 @@ const loginUser = async (req, res) => {
         if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        res.json({ token, name: user.name, hasPaid: user.hasPaid, stream: user.stream }); 
+        res.json({ token, name: user.name, hasPaid: user.hasPaid, stream: user.stream , id:user._id}); 
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
     }
@@ -102,34 +102,6 @@ const getTestYearsBySubject = async (req, res) => {
 };
 
 
-// Submit Test Attempt
-const submitTestAttempt = async (req, res) => {
-    const { userId, questions } = req.body;
-    
-    try {
-        let score = 0;
-        const totalQuestions = questions.length;
-
-        for (let question of questions) {
-            const correctQuestion = await Question.findById(question.questionId);
-            if (correctQuestion.correctAnswer === question.userAnswer) {
-                score++;
-            }
-        }
-
-        const testAttempt = new TestAttempt({
-            userId,
-            questions,
-            score,
-            totalQuestions,
-        });
-
-        await testAttempt.save();
-        res.status(201).json({ message: 'Test attempt submitted successfully', score });
-    } catch (error) {
-        res.status(500).json({ message: 'Error submitting test attempt', error });
-    }
-};
 
 
 // Upload Payment Screenshot
@@ -159,6 +131,55 @@ const uploadPaymentScreenshot = async (req, res) => {
 };
 
 
+// In your controller file (e.g., controllers/questionController.js)
+const getQuestionsByYearAndSubject = async (req, res) => {
+    const { subject, year } = req.query; // Expecting both subject and year as query parameters
+
+    try {
+        const questions = await Question.find({ subject, year }); // Find questions matching subject and year
+
+        if (questions.length === 0) {
+            return res.status(404).json({ message: 'No questions found for this subject and year.' });
+        }
+
+        res.json(questions); // Return the found questions
+    } catch (error) {
+        console.error('Error fetching questions:', error);
+        res.status(500).json({ message: 'Error fetching questions', error: error.message });
+    }
+};
+
+// In your controller file (e.g., controllers/testController.js)
+const submitTestAttempt = async (req, res) => {
+    const { userId, questions } = req.body;
+
+    try {
+        let score = 0;
+        const totalQuestions = questions.length;
+
+        for (let question of questions) {
+            const correctQuestion = await Question.findById(question.questionId);
+            if (correctQuestion.correctAnswer === question.userAnswer) {
+                score++;
+            }
+        }
+
+        const testAttempt = new TestAttempt({
+            userId,
+            questions,
+            score,
+            totalQuestions,
+        });
+
+        await testAttempt.save();
+        res.status(201).json({ message: 'Test attempt submitted successfully', score });
+    } catch (error) {
+        res.status(500).json({ message: 'Error submitting test attempt', error });
+    }
+};
+
+
+
 module.exports = {
     registerUser,
     loginUser,
@@ -167,4 +188,5 @@ module.exports = {
     getSubjects,
     getTestYearsBySubject,
     uploadPaymentScreenshot,
+    getQuestionsByYearAndSubject,
 };

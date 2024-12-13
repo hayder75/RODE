@@ -27,6 +27,8 @@ const LoginScreen = ({ navigation }) => {
         name: response.data.name,
         hasPaid: response.data.hasPaid,
         stream: response.data.stream,
+        token:response.data.token,
+        id:response.data.id,
       });
     } catch (error) {
       if (error.response) {

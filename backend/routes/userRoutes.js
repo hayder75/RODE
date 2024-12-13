@@ -8,6 +8,7 @@ const {
     getSubjects,
     getTestYearsBySubject,
     uploadPaymentScreenshot,
+    getQuestionsByYearAndSubject
 } = require('../controllers/userController');
 const { protect } = require('../middleware/userMiddleware');
 
@@ -33,4 +34,6 @@ router.get('/subjects' , getSubjects);
 router.get('/test-years', getTestYearsBySubject);
 
 router.post('/upload-payment-screenshot', protect, upload.single('image'), uploadPaymentScreenshot); 
+
+router.get('/questionslist' ,getQuestionsByYearAndSubject )
 module.exports = router;
