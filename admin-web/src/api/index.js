@@ -1,3 +1,4 @@
+// api/index.js
 import axios from 'axios';
 
 const API = axios.create({ baseURL: 'http://localhost:5000/api/v1/admin' });
@@ -10,8 +11,9 @@ API.interceptors.request.use(config => {
     }
     return config;
 });
+
 // Authentication
-export const login = (credentials) => API.post('/login', credentials); // Ensure this matches your backend route
+export const login = (credentials) => API.post('/login', credentials);
 
 // Question Management
 export const uploadQuestion = (questionData) => API.post('/questions', questionData);
@@ -26,3 +28,6 @@ export const getReferences = () => API.get('/references');
 // User Verification
 export const getPendingVerifications = () => API.get('/pending-verifications');
 export const verifyUser = (id) => API.put(`/users/${id}/verify`);
+
+// **Add this function**
+export const getAllUsers = () => API.get('/users'); // Ensure this matches your backend route

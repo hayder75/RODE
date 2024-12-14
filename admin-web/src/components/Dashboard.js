@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getPendingVerifications } from '../api/index';
 import ScreenshotCard from './ScreenshotCard';
-import './Dashboard.css'; // Importing CSS for styling
+import { Link } from 'react-router-dom'; // Import Link for navigation
+import './Dashboard.css';
 
 const Dashboard = () => {
   const [screenshots, setScreenshots] = useState([]);
@@ -29,6 +30,14 @@ const Dashboard = () => {
         <h1>Admin Dashboard</h1>
         <h2>Pending User Verifications</h2>
       </header>
+      
+      {/* Navigation to User Management */}
+      <nav>
+        <Link to="/users">
+          <button className="user-management-button">Manage Users</button>
+        </Link>
+      </nav>
+
       {screenshots.length === 0 ? (
         <p className="no-verifications">No users to be verified.</p>
       ) : (

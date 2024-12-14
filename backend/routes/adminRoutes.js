@@ -10,7 +10,9 @@ const {
     verifyUser,
     getAllUsers,
     getSingleUserById,
-    getPendingVerifications 
+    getPendingVerifications ,
+    getTotalUserCount,
+    getUsersByStream,
 } = require('../controllers/adminController');
 const { protectAdmin } = require('../middleware/authMiddleware');
 const router = express.Router();
@@ -38,5 +40,10 @@ router.get('/users/:id', protectAdmin, getSingleUserById); // Ensure this route 
 
 
 router.get('/pending-verifications', protectAdmin, getPendingVerifications); // New route for pending verifications
+
+// User Count
+router.get('/user-count', protectAdmin, getTotalUserCount);
+router.get('/users-by-stream', protectAdmin, getUsersByStream);
+
 
 module.exports = router;

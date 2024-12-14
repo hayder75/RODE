@@ -70,7 +70,7 @@ const PaymentScreen = ({ navigation }) => {
       Alert.alert('Success', 'Payment submitted! Waiting for admin approval.');
 
       // Navigate back to HomeScreen
-      navigation.navigate('HomeScreen', { hasPaid: false }); // Set hasPaid as false until verified
+      navigation.navigate('Homescreen', { hasPaid: false }); // Set hasPaid as false until verified
     } catch (error) {
       console.error(error);
       

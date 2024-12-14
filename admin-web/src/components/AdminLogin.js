@@ -7,16 +7,8 @@ const AdminLogin = ({ onLogin }) => { // Accept onLogin as a prop
   const [isLoading, setIsLoading] = useState(false); // Loading state
 
   const handleLogin = async () => {
-    setIsLoading(true); // Set loading state
-    try {
+    {
       await onLogin({ username, password }); // Use the passed onLogin handler
-      console.log('Credentials:', username, password);
-      console.log('Response:', data);
-
-    } catch (error) {
-      alert('Login failed. Please check your credentials.'); // Error feedback
-    } finally {
-      setIsLoading(false); // Reset loading state
     }
   };
 

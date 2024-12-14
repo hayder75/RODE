@@ -167,10 +167,22 @@ const verifyUser = async (req, res) => {
 };
 
 
+// In your adminController.js
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.find({}, 'name phoneNumber role state stream'); // Select fields to return
-        res.json(users);
+        const totalCount = users.length;
+
+        // Count users by stream
+        const naturalCount = users.filter(user => user.stream === 'Natural').length;
+        const socialCount = users.filter(user => user.stream === 'Social').length;
+
+        res.json({
+            totalCount,
+            naturalCount,
+            socialCount,
+            users,
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching users', error });
     }
@@ -206,15 +218,34 @@ const getPendingVerifications = async (req, res) => {
 };
 
   
+const getTotalUserCount = async (req, res) => {
+    try {
+        const count = await User.countDocuments();
+        res.json({ count });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user count', error });
+    }
+};
+
   
-  // Ensure you export this function in your admin controller module.exports section.
-  
+// In your adminController.js
+const getUsersByStream = async (req, res) => {
+    try {
+        const naturalCount = await User.countDocuments({ stream: 'Natural' });
+        const socialCount = await User.countDocuments({ stream: 'Social' });
+        res.json({ naturalCount, socialCount });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching stream counts', error });
+    }
+};
 
 
 module.exports = {
     loginAdmin,
     uploadQuestion,
     editQuestion,
+    getUsersByStream,
+    getTotalUserCount,
     deleteQuestion,
     uploadReference,
     getReferences,
