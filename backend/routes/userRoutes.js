@@ -22,7 +22,7 @@ router.post('/register', registerUser);
 // User Login
 router.post('/login', loginUser);
 
-// Get Questions
+// Get all question based on the parameters passed ( year and subjects clicked )
 router.get('/questions', getQuestions);
 
 // Submit Test Attempt

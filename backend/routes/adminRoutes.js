@@ -22,8 +22,8 @@ router.post('/login', loginAdmin);
 
 // Questions
 router.post('/questions', protectAdmin, uploadQuestion);
-router.put('/questions/:id', protectAdmin, editQuestion);
-router.delete('/questions/:id', protectAdmin, deleteQuestion);
+router.put('/questionsedit/:id', protectAdmin, editQuestion);
+router.delete('/questionsdelte/:id', protectAdmin, deleteQuestion);
 
 // References
 router.post('/references', protectAdmin, uploadReference);
@@ -34,12 +34,12 @@ router.delete('/references/:id', protectAdmin, deleteReference);
 router.put('/users/:id/verify', protectAdmin, verifyUser);
 
 // Get All Users
-router.get('/users', protectAdmin, getAllUsers); // Ensure this route is defined with GET method
+router.get('/users', protectAdmin, getAllUsers); // All users are listes 
 
-router.get('/users/:id', protectAdmin, getSingleUserById); // Ensure this route is defined with GET method
+router.get('/users/:id', protectAdmin, getSingleUserById); // a user
 
 
-router.get('/pending-verifications', protectAdmin, getPendingVerifications); // New route for pending verifications
+router.get('/pending-verifications', protectAdmin, getPendingVerifications); // users waititng to be verififed
 
 // User Count
 router.get('/user-count', protectAdmin, getTotalUserCount);

@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet,
 import tw from 'tailwind-react-native-classnames';
 import axiosInstance from '../../axiosInstance';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Logo from '../../src/Untitled design.png'; // Adjust path as needed
+import Logo from '../Untitled_design-removebg.png'; // Adjust path as needed
 
 const LoginScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');

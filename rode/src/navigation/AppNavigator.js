@@ -9,7 +9,8 @@ import SubjectListScreen from '../screens/SubjectListScreen';
 import YearSelectionScreen from '../screens/YearSelectionScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import TestScreen from '../screens/TestScreen';
-
+import ProfileScreen from '../screens/ProfileScreen'; // Ensure ProfileScreen is imported 
+import ProgressScreen from '../screens/ProgressScreen'; // Ensure ProgressScreen is imported 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -23,7 +24,8 @@ const AppNavigator = () => {
         <Stack.Screen name="YearSelectionScreen" component={YearSelectionScreen} />
         <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
         <Stack.Screen name="TestScreen" component={TestScreen} />
-
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} /> 
+        <Stack.Screen name="ProgressScreen" component={ProgressScreen} /> 
       </Stack.Navigator>
     </NavigationContainer>
   );
