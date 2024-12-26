@@ -1,9 +1,11 @@
 const User = require('../models/User');
 const Question = require('../models/Question');
+const EntryCode = require('../models/EntryCode');
 const TestAttempt = require('../models/TestAttempt');
 const jwt = require('jsonwebtoken');
 const cloudinary = require ('cloudinary').v2;
 const multer = require('multer');
+const crypto = require('crypto'); 
 
 // Configuration
 cloudinary.config({ 
@@ -14,27 +16,89 @@ cloudinary.config({
 
 const upload = multer({ dest: 'uploads/' }); 
 
-// User Registration
+// Generate Referral ID
+const generateReferralID = () => {
+    return crypto.randomBytes(4).toString('hex'); // Generates a unique 8-character ID
+};
+
+// User Registration with Enhanced Error Handling
 const registerUser = async (req, res) => {
-    const { name, phoneNumber, password, stream, school } = req.body; // Removed state from destructuring
+    const { name, phoneNumber, password, stream, school, referralID, entryCode } = req.body;
+
+    // Basic validation checks
+    if (!name || !phoneNumber || !password || !stream) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+    if (!/^[a-zA-Z\s]+$/.test(name)) {
+        return res.status(400).json({ message: 'Name can only contain letters and spaces' });
+    }
+
     try {
-        // Create a new user with default values for hasPaid and state
+        // Check if phone number already exists
+        const existingUser = await User.findOne({ phoneNumber });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Phone number already used' });
+        }
+
+        let referredBy = null;
+        if (referralID) {
+            const referringUser = await User.findOne({ referralID });
+            if (!referringUser) {
+                return res.status(400).json({ message: 'Invalid referral ID' });
+            }
+            referredBy = referringUser.referralID;
+            referringUser.referralCount = (referringUser.referralCount || 0) + 1;
+            await referringUser.save();
+        }
+
+        // Generate a new referral ID for the new user
+        const newReferralID = generateReferralID();
+
+        let hasPaid = false;
+        let validCode = null;
+
+        // Handle entry code if provided
+        let entryCodeUsed = false; // Default value for entry code usage
+        if (entryCode) {
+            validCode = await EntryCode.findOne({ code: entryCode, isUsed: false });
+            if (!validCode) {
+                return res.status(400).json({ message: 'Invalid or already used entry code' });
+            }
+            hasPaid = true;
+            entryCodeUsed = true; // Set to true since an entry code was used
+        }
+
+        // Create a new user
         const newUser = new User({
             name,
             phoneNumber,
             password,
             stream,
             school,
-            hasPaid: false, // Default to false if payment not made
-            state: "Not Verified" // Default state is 'Not Verified'
+            hasPaid,
+            referralID: newReferralID, // Assign the generated referral ID
+            referredBy,
+            entryCodeUsed, // Use the updated value for entryCodeUsed
+            state: hasPaid ? 'Verified' : 'Not Verified',
         });
 
         await newUser.save();
-        res.status(201).json({ message: 'User registered successfully' });
+
+        // Mark the entry code as used if applicable
+        if (validCode) {
+            validCode.isUsed = true;
+            validCode.usedBy = newUser._id;
+            await validCode.save();
+        }
+
+        res.status(201).json({ message: 'User registered successfully', user: newUser });
     } catch (error) {
-        res.status(500).json({ message: 'Error registering user', error });
+        console.error('Error registering user:', error);
+        res.status(500).json({ message: 'Error registering user', error: error.message });
     }
 };
+
+
 
 // User Login
 const loginUser = async (req, res) => {
@@ -131,6 +195,7 @@ const uploadPaymentScreenshot = async (req, res) => {
 };
 
 
+
 // In your controller file (e.g., controllers/questionController.js)
 const getQuestionsByYearAndSubject = async (req, res) => {
     const { subject, year } = req.query; // Expecting both subject and year as query parameters
@@ -189,4 +254,5 @@ module.exports = {
     getTestYearsBySubject,
     uploadPaymentScreenshot,
     getQuestionsByYearAndSubject,
+    
 };

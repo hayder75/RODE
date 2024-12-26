@@ -27,15 +27,36 @@ const userSchema = new mongoose.Schema({
   },
   school: {
     type: String,
-    default:'School'
+    default: 'School'
   },
   state: {
     type: String,
-   default: "Not Verified",
+    default: "Not Verified",
   },
   paymentScreenshotUrl: { // New field for storing payment screenshot URL
     type: String,
     default: null
+  },
+  profilePicture: {
+    type: String,
+    default: null,
+  },
+  lastLogin: {
+    type: Date,
+    default: null,
+  },
+  referralID:
+  {
+    type: String,
+    unique: true,
+  },
+  referredBy: {
+    type: String,
+    default: null,
+  },
+  entryCodeUsed: {
+    type: Boolean,
+    default: false,
   },
 });
 

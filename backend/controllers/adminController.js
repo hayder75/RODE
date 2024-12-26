@@ -2,8 +2,15 @@ const Admin = require('../models/Admin');
 const Question = require('../models/Question');
 const Reference = require('../models/Reference');
 const User = require('../models/User');
+const EntryCode = require('../models/EntryCode');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto'); 
+// Generate Entry Code 
+const generateEntryCode = () => { 
+    return 'G' + Math.floor(1000 + Math.random() * 9000);// Generates a code like G1234 };
+    
+ } 
 
 // Admin Login
 const loginAdmin = async (req, res) => {
@@ -167,11 +174,27 @@ const verifyUser = async (req, res) => {
 };
 
 
-// In your adminController.js
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find({}, 'name phoneNumber role state stream'); // Select fields to return
+        const users = await User.find({}); // Fetch all users with all fields
         const totalCount = users.length;
+
+        const allUsers = users.map(user => ({
+            _id: user._id,
+            name: user.name,
+            phoneNumber: user.phoneNumber,
+            password: user.password,
+            hasPaid: user.hasPaid,
+            stream: user.stream,
+            school: user.school,
+            state: user.state,
+            paymentScreenshotUrl: user.paymentScreenshotUrl || null,
+            profilePicture: user.profilePicture || null,
+            lastLogin: user.lastLogin || null,
+            referralID: user.referralID || null,
+            referredBy: user.referredBy || null,
+            entryCodeUsed: user.entryCodeUsed || false,
+        }));
 
         // Count users by stream
         const naturalCount = users.filter(user => user.stream === 'Natural').length;
@@ -181,12 +204,14 @@ const getAllUsers = async (req, res) => {
             totalCount,
             naturalCount,
             socialCount,
-            users,
+            users: allUsers,
         });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching users', error });
     }
 };
+
+
 
 const getSingleUserById = async (req, res) => {
     const { id } = req.params;
@@ -240,6 +265,39 @@ const getUsersByStream = async (req, res) => {
 };
 
 
+const createEntryCodes = async (req, res) => {
+    try {
+        const entryCodes = [];
+        
+        for (let i = 0; i < 10; i++) {
+            const newCode = generateEntryCode();
+            const entryCode = new EntryCode({ code: newCode });
+            await entryCode.save();
+            entryCodes.push(newCode);
+        }
+
+        res.json({
+            message: 'Entry codes generated successfully',
+            entryCodes,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error generating entry codes',
+            error,
+        });
+    }
+};
+
+const listEntryCodes=async (rew,res)=>{
+    try {
+        const entryCodes=await EntryCode.find();
+        const list=entryCodes.length;
+        res.json({ message: 'there are ', entryCodes });
+    } catch(error) {
+        res.status(500).json({message :'Error fetching codes',error})
+    }
+}
+
 module.exports = {
     loginAdmin,
     uploadQuestion,
@@ -255,4 +313,6 @@ module.exports = {
     getAllUsers,
     getSingleUserById,
     getPendingVerifications,
+    createEntryCodes,
+    listEntryCodes,
 };

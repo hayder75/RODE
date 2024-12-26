@@ -13,6 +13,8 @@ const {
     getPendingVerifications ,
     getTotalUserCount,
     getUsersByStream,
+    createEntryCodes,
+    listEntryCodes,
 } = require('../controllers/adminController');
 const { protectAdmin } = require('../middleware/authMiddleware');
 const router = express.Router();
@@ -44,6 +46,9 @@ router.get('/pending-verifications', protectAdmin, getPendingVerifications); // 
 // User Count
 router.get('/user-count', protectAdmin, getTotalUserCount);
 router.get('/users-by-stream', protectAdmin, getUsersByStream);
+
+router.get('/createEntryCodes',protectAdmin,createEntryCodes);
+router.get('/listEntryCodes',protectAdmin,listEntryCodes);
 
 
 module.exports = router;
