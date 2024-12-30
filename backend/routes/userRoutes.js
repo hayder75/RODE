@@ -8,7 +8,9 @@ const {
     getSubjects,
     getTestYearsBySubject,
     uploadPaymentScreenshot,
-    getQuestionsByYearAndSubject
+    getQuestionsByYearAndSubject,
+    startTest,
+    updateProgress,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/userMiddleware');
 
@@ -36,4 +38,6 @@ router.get('/test-years', getTestYearsBySubject);
 router.post('/upload-payment-screenshot', protect, upload.single('image'), uploadPaymentScreenshot); 
 
 router.get('/questionslist' ,getQuestionsByYearAndSubject )
+router.post('/start-test', startTest)
+router.post('/update-progress',updateProgress)
 module.exports = router;

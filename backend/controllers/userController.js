@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Question = require('../models/Question');
 const EntryCode = require('../models/EntryCode');
+const UserProgress = require('../models/UserProgress');
 const TestAttempt = require('../models/TestAttempt');
 const jwt = require('jsonwebtoken');
 const cloudinary = require ('cloudinary').v2;
@@ -122,7 +123,11 @@ const loginUser = async (req, res) => {
 const getQuestions = async (req, res) => {
     const { stream, subject, year } = req.query; // Accept year as query parameter
     try {
-        const questions = await Question.find({ stream, subject, year }); // Filter by year
+        let questions = await Question.find({ stream, subject, year }); // Filter by year
+
+        // Shuffle questions
+        questions = questions.sort(() => Math.random() - 0.5);
+
         res.json(questions);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching questions', error });
@@ -214,34 +219,101 @@ const getQuestionsByYearAndSubject = async (req, res) => {
     }
 };
 
-// In your controller file (e.g., controllers/testController.js)
+
+const startTest = async (req, res) => {
+    const { userId, subject, year } = req.body;
+    
+    try {
+        let userProgress = await UserProgress.findOne({ userId, subject, year, isCompleted: false });
+
+        if (!userProgress) {
+            userProgress = new UserProgress({
+                userId,
+                subject,
+                year,
+                answeredQuestions: [],
+                currentQuestion: 0,
+                isCompleted: false,
+            });
+            await userProgress.save();
+        }
+
+        res.status(200).json({ message: 'Test started successfully', progress: userProgress });
+    } catch (error) {
+        console.error('Error starting test:', error);
+        res.status(500).json({ message: 'Error starting test', error: error.message });
+    }
+};
+
+const updateProgress = async (req, res) => {
+    const { userId, questionId, userAnswer } = req.body;
+    
+    try {
+        let userProgress = await UserProgress.findOne({ userId, isCompleted: false });
+
+        if (!userProgress) {
+            return res.status(404).json({ message: 'No active test found' });
+        }
+
+        userProgress.answeredQuestions.push({ questionId, userAnswer });
+        userProgress.currentQuestion += 1;
+        await userProgress.save();
+
+        res.status(200).json({ message: 'Progress updated successfully', progress: userProgress });
+    } catch (error) {
+        console.error('Error updating progress:', error);
+        res.status(500).json({ message: 'Error updating progress', error: error.message });
+    }
+};
+
+
 const submitTestAttempt = async (req, res) => {
-    const { userId, questions } = req.body;
+    const { userId, subject, year, stream, questions } = req.body;
 
     try {
+        console.log('Received data:', { userId, subject, year, stream, questions });
+
+        // Initialize score and totalQuestions
         let score = 0;
         const totalQuestions = questions.length;
 
-        for (let question of questions) {
-            const correctQuestion = await Question.findById(question.questionId);
-            if (correctQuestion.correctAnswer === question.userAnswer) {
-                score++;
-            }
-        }
+        // Calculate score and prepare question results
+        const questionResults = questions.map((question) => {
+            const isCorrect = question.isCorrect;
+            if (isCorrect) score += 1; // Increment score for correct answers
 
-        const testAttempt = new TestAttempt({
-            userId,
-            questions,
-            score,
-            totalQuestions,
+            return {
+                questionId: question.questionId,
+                userAnswer: question.userAnswer,
+                isCorrect,
+            };
         });
 
+        console.log('Calculated score:', score);
+        console.log('Question results:', questionResults);
+
+        // Create a new test attempt document
+        const testAttempt = new TestAttempt({
+            userId,
+            subject,
+            year,
+            stream,
+            score,
+            totalQuestions,
+            questions: questionResults,
+        });
+
+        // Save the test attempt to the database
         await testAttempt.save();
-        res.status(201).json({ message: 'Test attempt submitted successfully', score });
+
+        // Send the response back with the score
+        res.status(200).json({ score });
     } catch (error) {
-        res.status(500).json({ message: 'Error submitting test attempt', error });
+        console.error('Error submitting test attempt:', error);
+        res.status(500).json({ message: 'Error submitting test attempt', error: error.message });
     }
 };
+
 
 
 
@@ -254,5 +326,12 @@ module.exports = {
     getTestYearsBySubject,
     uploadPaymentScreenshot,
     getQuestionsByYearAndSubject,
+    startTest,
+    updateProgress
+
     
 };
+
+
+
+

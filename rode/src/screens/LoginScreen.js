@@ -13,41 +13,45 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     if (!phoneNumber.trim() || !password.trim()) {
-      setErrorMessage('Please fill in all fields.');
-      return;
+        setErrorMessage('Please fill in all fields.');
+        return;
     }
 
     setLoading(true);
     setErrorMessage('');
 
     try {
-      const response = await axiosInstance.post('/login', { phoneNumber, password });
-      await AsyncStorage.setItem('token', response.data.token);
-      navigation.navigate('Homescreen', {
-        name: response.data.name,
-        hasPaid: response.data.hasPaid,
-        stream: response.data.stream,
-        token:response.data.token,
-        id:response.data.id,
-      });
+        const response = await axiosInstance.post('/login', { phoneNumber, password });
+        const { token, name, hasPaid, stream, id } = response.data;
+
+        await AsyncStorage.multiSet([
+            ['token', token],
+            ['name', name],
+            ['hasPaid', JSON.stringify(hasPaid)],
+            ['stream', stream],
+            ['id', id],
+        ]);
+
+        navigation.navigate('Homescreen');
     } catch (error) {
-      if (error.response) {
-        setErrorMessage(error.response.data.message || 'Error logging in');
-      } else if (error.request) {
-        setErrorMessage('Network error: No response received');
-      } else {
-        setErrorMessage('Error: ' + error.message);
-      }
+        if (error.response) {
+            setErrorMessage(error.response.data.message || 'Error logging in');
+        } else if (error.request) {
+            setErrorMessage('Network error: No response received');
+        } else {
+            setErrorMessage('Error: ' + error.message);
+        }
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   return (
     <View style={tw`flex-1 bg-white justify-center px-6`}>
       {/* PNG Logo */}
       <View style={styles.logoContainer}>
-        <Image source={Logo} style={{ width: 400, height: 400 }} />
+        {/* <Image source={Logo} style={{ width: 400, height: 400 }} /> */}
       </View>
 
       <Text style={tw`text-3xl font-bold mb-8 text-center`}>Login</Text>
